@@ -6,6 +6,11 @@ var express = require('express')
 
 server.listen(port);
 
+io.configure(function () { 
+  io.set("transports", ["xhr-polling"]); 
+  io.set("polling duration", 10); 
+});
+
 app.configure(function() {
     app.use(express.static(__dirname + '/public'));
       app.use(app.router);
