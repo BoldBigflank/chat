@@ -1,0 +1,1 @@
+3 SELECT subids,emplevel,cookie_exp FROM affiliates WHERE IDnum=12421<br>4 UPDATE Images SET thedate='2/4/2013 7:13:49 PM',Impressions = Impressions + 1 WHERE idnum=12421 and Image = '40'<br>
