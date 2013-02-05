@@ -1,13 +1,14 @@
 var express = require('express')
   , app = express()
   , server = require('http').createServer(app)
-  , io = require('socket.io').listen(server)
+  , io = require('socket.io')
   , port = process.env.PORT || 3000;
 
 io.configure(function () { 
   io.set("transports", ["xhr-polling"]); 
   io.set("polling duration", 10); 
 });
+io.listen(server)
 
 server.listen(port);
 
