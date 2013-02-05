@@ -14,6 +14,9 @@ socket.on('updatechat', function(username, data) {
 
 // listener, whenever the server emits 'updaterooms', this updates the room the client
 socket.on('updaterooms', function (rooms, current_room) {
+
+  
+
   $('#rooms').empty();
   $.each(rooms, function(key, value) {
     if (value == current_room) {
