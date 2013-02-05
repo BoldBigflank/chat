@@ -4,12 +4,14 @@ var express = require('express')
   , io = require('socket.io').listen(server)
   , port = process.env.PORT || 3000;
 
-server.listen(port);
-
 io.configure(function () { 
   io.set("transports", ["xhr-polling"]); 
   io.set("polling duration", 10); 
 });
+
+server.listen(port);
+
+
 
 app.configure(function() {
     app.use(express.static(__dirname + '/public'));
