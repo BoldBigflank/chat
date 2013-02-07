@@ -1,0 +1,35 @@
+<?php
+
+include ('config.inc.php');
+
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN"
+  "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php print $language->language; ?>" version="XHTML+RDFa 1.0" dir="<?php print $language->dir; ?>"
+  <?php print $rdf_namespaces; ?>>
+
+<head profile="<?php print $grddl_profile; ?>">
+  <?php print $head; ?>
+  <title><?php print $head_title; ?></title>
+  <?php print $styles; ?>
+  <?php print $scripts; ?>
+  <script type="text/javascript" src="sites/all/js/group.js"></script>
+  <script type="text/javascript">
+	
+  jQuery(window).bind('beforeunload', function(){
+     return 'Are you sure you want to be disconnected from this chat?';
+     //leaveChat();
+  });
+
+  jQuery(window).unload(function(){
+     //kill the session
+     leaveChat();
+  });	
+</script>
+</head>
+<body class="<?php print $classes; ?>" <?php print $attributes;?> onload="getNumberOfOnlineUsers();">
+  <?php print $page_top; ?>
+  <?php print $page; ?>
+  <?php print $page_bottom; ?>
+</body>
+</html>
