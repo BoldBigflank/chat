@@ -15,26 +15,18 @@ app.get('/', function (req, res) {
   res.sendfile(__dirname + '/index.html');
 });
 
-io.sockets.on('connection', function (socket) {
-  socket.emit('news', { hello: 'world' });
-  socket.on('my other event', function (data) {
-    console.log(data);
-  });
-});
-
 var usernames = {};
 
 var rooms = ['group_a', 'group_b'];
 
 io.sockets.on('connection', function (socket) {
 
-  socket.on('adduser', function(group) {
+  socket.on('adduser', function(group, fn) {
   	// A socket has declared a group
   	socket.group = group
 
   	// If someone from the other room
   	var partner_room = (group == 'group_a') ? 'group_b' : 'group_a';
-  	console.log(io.sockets.clients(partner_room))
   	if(io.sockets.clients(partner_room).length > 0){
   		//Put this user and someone from the other group in a room.
   		var room = new Date().getTime();
@@ -42,15 +34,25 @@ io.sockets.on('connection', function (socket) {
   		partner.leave(partner_room)
   		partner.join(room)
   		partner.room = room
+      socket.leave(socket.room)
   		socket.join(room)
   		socket.room = room
   		io.sockets.in(room).emit('updaterooms', room)
 
   	} else {
   		// Else put them in their room to wait
-  		socket.join(group)
+  		socket.leave(socket.room)
+      socket.join(group)
   		console.log("user added to wait list", group)
   	} 
+    // Change the number of online folks
+    var count = io.sockets.clients().length
+    var countgroup = Math.max(io.sockets.clients('group_a').length, io.sockets.clients('group_b')) 
+    var whois = (io.sockets.clients('group_a').length > io.sockets.clients('group_b')) ? "Listeners" : "Venters";
+    io.sockets.emit('onlineusers', count, countgroup, whois )
+    
+    // Return the user's id
+    fn(socket.id)
   	
 
 
@@ -62,13 +64,28 @@ io.sockets.on('connection', function (socket) {
     // socket.emit('updaterooms', rooms, 'room1');
   });
 
+  socket.on('typing', function(isTyping){
+    socket.broadcast.to(socket.room).emit('isTyping', isTyping)
+  })
+
   socket.on('sendchat', function (data) {
-    io.sockets.in(socket.room).emit('updatechat', socket.group, data);
+    // Send the message to everyone but themselves
+    // Prevent html injection
+    var message = data
+    socket.broadcast.to(socket.room).emit('updatechat', socket.id, message);
   });
 
   socket.on('disconnect', function () {
     // delete usernames[socket.username];
-    io.sockets.emit('updateusers', usernames);
-    socket.broadcast.emit('updatechat', 'SERVER', socket.username + ' has disconnected');
+    if(socket.room && socket.room != 'group_a' && socket.room != 'group_b'){
+      socket.broadcast.to(socket.room).emit('userdisconnected', socket.id);
+      // May need to update 'onlineusers'
+
+      var count = io.sockets.clients().length
+      var countgroup = Math.max(io.sockets.clients('group_a').length, io.sockets.clients('group_b'))
+      var whois = (io.sockets.clients('group_a').length > io.sockets.clients('group_b')) ? "Listeners" : "Venters";
+      io.sockets.emit('onlineusers', count, countgroup, whois )
+      
+    }
   });
 });
