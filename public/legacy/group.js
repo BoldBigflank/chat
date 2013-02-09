@@ -516,7 +516,7 @@ function sendMsg()
 
 		{
 			socket.emit('sendchat', msg)
-			// appendMyMessage();
+			appendMyMessage();
 		}
 
 	}
